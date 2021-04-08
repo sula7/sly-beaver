@@ -12,11 +12,6 @@ func main() {
 	workDir := filepath.Dir(os.Args[0])
 	dbFilePath := filepath.Join(filepath.Join(workDir, "sly-beaver.db"))
 
-	err := storage.CreateDBFile(dbFilePath)
-	if err != nil {
-		log.Fatalln("create .db file:", err)
-	}
-
 	db, err := storage.OpenDB(dbFilePath)
 	if err != nil {
 		log.Fatalln("open db connection:", err)

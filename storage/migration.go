@@ -15,7 +15,7 @@ func (s *SqLite) RunMigrations() error {
 		return fmt.Errorf("begin ctx transaction: %w", err)
 	}
 
-	_, err = tx.ExecContext(ctx, `CREATE TABLE user(login text, password text);`)
+	_, err = tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS user(login text, password text);`)
 	if err != nil {
 		err = tx.Rollback()
 		if err != nil {
