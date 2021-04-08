@@ -29,3 +29,13 @@ func OpenDB(filePath string) (*SqLite, error) {
 
 	return &SqLite{db: db}, err
 }
+
+func (s *SqLite) CheckPassword(login, password string) (isExists, isAdmin bool, err error) {
+	err = s.db.QueryRow(`SELECT exists(SELECT login
+			FROM user
+			WHERE login = $1
+			  AND password = $2), is_admin
+			  FROM user`, login, password).
+		Scan(&isExists, &isAdmin)
+	return
+}

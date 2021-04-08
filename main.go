@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"sly-beaver/cli"
 	"sly-beaver/storage"
 )
 
@@ -28,4 +29,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("run migrations:", err)
 	}
+
+	cliService := cli.NewCLIService(db)
+	cliService.Start()
 }
