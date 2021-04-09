@@ -7,8 +7,18 @@ import (
 )
 
 func (s *SqLite) RunMigrations() error {
-	ctx, cancelFunc := context.WithTimeout(context.Background(), 10 * time.Second)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancelFunc()
+
+	var isDBActual bool
+	err := s.db.QueryRow(`SELECT exists(SELECT name FROM sqlite_master WHERE name = 'user')`).Scan(&isDBActual)
+	if err != nil {
+		return fmt.Errorf("check db version: %w", err)
+	}
+
+	if isDBActual {
+		return nil
+	}
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -21,7 +31,7 @@ func (s *SqLite) RunMigrations() error {
 		if err != nil {
 			return fmt.Errorf("tx rollback: %w", err)
 		}
-		return err
+		return fmt.Errorf("create table user: %w", err)
 	}
 
 	_, err = tx.ExecContext(ctx, `INSERT INTO user (login, password, is_admin)
@@ -31,7 +41,7 @@ func (s *SqLite) RunMigrations() error {
 		if err != nil {
 			return fmt.Errorf("tx rollback: %w", err)
 		}
-		return err
+		return fmt.Errorf("insert users: %w", err)
 	}
 
 	return tx.Commit()
