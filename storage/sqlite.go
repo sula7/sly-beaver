@@ -35,7 +35,8 @@ func (s *SqLite) CheckPassword(login, password string) (isExists, isAdmin bool, 
 			FROM user
 			WHERE login = $1
 			  AND password = $2), is_admin
-			  FROM user`, login, password).
+			  FROM user
+			WHERE login = $1 AND password = $2`, login, password).
 		Scan(&isExists, &isAdmin)
 	return
 }
