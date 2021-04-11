@@ -28,7 +28,10 @@ func (c *CLI) Start() {
 
 		m.ShowFirstLevel()
 
-		m.ShowSecondLevel()
+		err := m.ShowSecondLevel(c.storage)
+		if err != nil {
+			fmt.Println("ошибка: меню второго уровня:", err)
+		}
 	}
 }
 

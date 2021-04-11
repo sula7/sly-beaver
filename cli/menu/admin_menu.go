@@ -48,7 +48,7 @@ func (m *AdminMenu) ShowFirstLevel() {
 	}
 }
 
-func (m *AdminMenu) ShowSecondLevel() {
+func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 	switch m.userAction {
 	case 1:
 		assert := storage.Assert{}
@@ -113,7 +113,16 @@ func (m *AdminMenu) ShowSecondLevel() {
 			}
 			break
 		}
+
+		err = s.CreateAssert(&assert)
+		if err != nil {
+			return fmt.Errorf("создание номенклатуры: %w", err)
+		}
+
+		fmt.Println()
 	case 2:
 	case 3:
 	}
+
+	return nil
 }

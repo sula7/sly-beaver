@@ -25,24 +25,22 @@ func (s *SqLite) RunMigrations() error {
 		return fmt.Errorf("begin ctx transaction: %w", err)
 	}
 
-	_, err = tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS user(login text, password text, is_admin boolean);`)
-	if err != nil {
-		err = tx.Rollback()
-		if err != nil {
-			return fmt.Errorf("tx rollback: %w", err)
-		}
-		return fmt.Errorf("create table user: %w", err)
-	}
+	_, err = tx.ExecContext(ctx, `
+		CREATE TABLE IF NOT EXISTS user(login text, password text, is_admin boolean);
+		INSERT INTO user (login, password, is_admin)
+		VALUES ('admin', '1234', true),
+		       ('guest', '4321', false);
 
-	_, err = tx.ExecContext(ctx, `INSERT INTO user (login, password, is_admin)
-			VALUES ('admin', '1234', true), ('guest', '4321', false)`)
-	if err != nil {
-		err = tx.Rollback()
-		if err != nil {
-			return fmt.Errorf("tx rollback: %w", err)
-		}
-		return fmt.Errorf("insert users: %w", err)
-	}
+		CREATE TABLE IF NOT EXISTS assert
+			(
+			    id         integer NOT NULL CONSTRAINT table_name_pk PRIMARY KEY AUTOINCREMENT,
+			    name       text    NOT NULL,
+			    amount     integer NOT NULL,
+			    cost       integer NOT NULL,
+			    valid_to   text    NOT NULL,
+			    created_at text    NOT NULL DEFAULT CURRENT_DATE
+			);
+		CREATE UNIQUE INDEX table_name_id_uindex ON assert (id);`)
 
 	return tx.Commit()
 }

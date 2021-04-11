@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
+	"sly-beaver/storage"
 )
 
 type GuestMenu struct {
@@ -44,5 +46,6 @@ func (m *GuestMenu) ShowFirstLevel() {
 	}
 }
 
-func (m *GuestMenu) ShowSecondLevel() {
+func (m *GuestMenu) ShowSecondLevel(s storage.Storage) error {
+	return nil
 }
