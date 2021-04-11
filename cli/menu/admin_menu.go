@@ -57,15 +57,12 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 		assert := storage.Assert{}
 		var err error
 
-		for {
-			fmt.Println("\nВведите наименование:")
-			_, err = fmt.Scanln(&assert.Name)
-			if err != nil {
-				return fmt.Errorf("create - scan name input: %w", err)
-			}
-			assert.Name = strings.TrimSpace(assert.Name)
-			break
+		fmt.Println("\nВведите наименование:")
+		_, err = fmt.Scanln(&assert.Name)
+		if err != nil {
+			return fmt.Errorf("create - scan name input: %w", err)
 		}
+		assert.Name = strings.TrimSpace(assert.Name)
 
 		for {
 			var amount string

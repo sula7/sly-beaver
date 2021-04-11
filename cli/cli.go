@@ -65,7 +65,8 @@ func (c *CLI) authUser() bool {
 		}
 
 		if !isUserExists {
-			fmt.Println("Неверный логин и/или пароль\n")
+			fmt.Println("Неверный логин и/или пароль")
+			fmt.Println()
 			continue
 		}
 

@@ -42,6 +42,13 @@ func (s *SqLite) RunMigrations() error {
 				remove_reason text
 			);
 		CREATE UNIQUE INDEX table_name_id_uindex ON assert (id);`)
+	if err != nil {
+		fmt.Println("migration exec cancelled:", err)
+		err = tx.Rollback()
+		if err != nil {
+			fmt.Println("tx rollback:", err)
+		}
+	}
 
 	return tx.Commit()
 }
