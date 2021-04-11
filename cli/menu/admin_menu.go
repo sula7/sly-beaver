@@ -119,6 +119,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 			return fmt.Errorf("создание номенклатуры: %w", err)
 		}
 
+		fmt.Println("Запись создана")
 		fmt.Println()
 	case 2:
 	case 3:
