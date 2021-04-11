@@ -38,7 +38,8 @@ func (s *SqLite) RunMigrations() error {
 			    amount     integer NOT NULL,
 			    cost       integer NOT NULL,
 			    valid_to   text    NOT NULL,
-			    created_at text    NOT NULL DEFAULT CURRENT_DATE
+			    created_at text    NOT NULL DEFAULT CURRENT_DATE,
+				remove_reason boolean
 			);
 		CREATE UNIQUE INDEX table_name_id_uindex ON assert (id);`)
 
