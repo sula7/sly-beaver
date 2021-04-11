@@ -4,12 +4,15 @@ import (
 	"database/sql"
 	"fmt"
 
+	"sly-beaver/cli/menu"
 	"sly-beaver/storage"
 )
 
 type CLI struct {
 	storage storage.Storage
 }
+
+const inputErrMsg = "Неверный ввод, проверьте данные и повторите снова\n"
 
 func NewCLIService(storage storage.Storage) *CLI {
 	return &CLI{storage: storage}
@@ -18,15 +21,15 @@ func NewCLIService(storage storage.Storage) *CLI {
 func (c *CLI) Start() {
 	isUserAdmin := c.authUser()
 
-	for {
-		showMainMenu(isUserAdmin)
-		var mainMenuInput uint8
-		_, err := fmt.Scanln(&mainMenuInput)
-		if err != nil {
-			fmt.Println("Неверный ввод, проверьте данные и повторите снова\n")
-		}
-	}
+	m := menu.New(isUserAdmin)
 
+	for {
+		fmt.Println("Выберите действие:")
+
+		m.ShowFirstLevel()
+
+		m.ShowSecondLevel()
+	}
 }
 
 func (c *CLI) authUser() bool {
@@ -39,13 +42,13 @@ func (c *CLI) authUser() bool {
 		fmt.Println("Введите логин:")
 		_, err := fmt.Scanln(&login)
 		if err != nil {
-			fmt.Println("Неверный ввод, проверьте данные и повторите снова\n")
+			fmt.Println(inputErrMsg)
 		}
 
 		fmt.Println("Введите пароль:")
 		_, err = fmt.Scanln(&password)
 		if err != nil {
-			fmt.Println("Неверный ввод, проверьте данные и повторите снова\n")
+			fmt.Println(inputErrMsg)
 			continue
 		}
 
@@ -56,7 +59,7 @@ func (c *CLI) authUser() bool {
 		}
 
 		if !isUserExists {
-			fmt.Println("Неверные логин/пароль, проверьте данные и повторите снова\n")
+			fmt.Println("Неверный логин и/или пароль\n")
 			continue
 		}
 
@@ -65,18 +68,4 @@ func (c *CLI) authUser() bool {
 	}
 
 	return isAdmin
-}
-
-func showMainMenu(isUserAdmin bool) {
-	fmt.Println("Выберите действие:")
-
-	switch isUserAdmin {
-	case true:
-		fmt.Println("1. Создать номенклатуру")
-		fmt.Println("2. Удалить номенклатуру")
-		fmt.Println("3. Распечатать номенклатуру")
-	default:
-		fmt.Println("1. Просмотреть номенклатуры")
-		fmt.Println("2. Распечатать номенклатуры")
-	}
 }
