@@ -61,8 +61,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 			fmt.Println("\nВведите наименование:")
 			_, err = fmt.Scanln(&assert.Name)
 			if err != nil {
-				fmt.Println(inputErrMsg)
-				continue
+				return fmt.Errorf("create - scan name input: %w", err)
 			}
 			assert.Name = strings.TrimSpace(assert.Name)
 			break
@@ -73,8 +72,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 			fmt.Println("Введите количество:")
 			_, err = fmt.Scanln(&amount)
 			if err != nil {
-				fmt.Println(inputErrMsg)
-				continue
+				return fmt.Errorf("create - scan amount input: %w", err)
 			}
 
 			assert.Amount, err = strconv.ParseInt(strings.TrimSpace(amount), 10, 64)
@@ -90,8 +88,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 			fmt.Println("Введите стоимость:")
 			_, err = fmt.Scanln(&cost)
 			if err != nil {
-				fmt.Println(inputErrMsg)
-				continue
+				return fmt.Errorf("create - scan cost input: %w", err)
 			}
 
 			assert.Cost, err = strconv.ParseInt(strings.TrimSpace(cost), 10, 64)
@@ -106,8 +103,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 			fmt.Println("Введите срок годности (ГГГГ-ММ-ДД):")
 			_, err = fmt.Scanln(&assert.ValidTo)
 			if err != nil {
-				fmt.Println(inputErrMsg)
-				continue
+				return fmt.Errorf("create - scan valid to input: %w", err)
 			}
 			_, err = time.Parse("2006-01-02", assert.ValidTo)
 			if err != nil {
@@ -119,7 +115,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 
 		err = s.CreateAssert(&assert)
 		if err != nil {
-			return fmt.Errorf("создание номенклатуры: %w", err)
+			return fmt.Errorf("create - db exec: %w", err)
 		}
 
 		fmt.Println("Запись создана")
@@ -149,7 +145,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 
 			_, err = fmt.Scanln(&rowID)
 			if err != nil {
-				return fmt.Errorf("id input while remove row: %w", err)
+				return fmt.Errorf("remove - scan id input: %w", err)
 			}
 
 			id, err = strconv.ParseInt(rowID, 10, 64)
@@ -167,7 +163,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 			fmt.Println("Введите причину удаления:")
 			_, err = fmt.Scanln(&assert.RemoveReason)
 			if err != nil {
-				return fmt.Errorf("remove reason input: %w", err)
+				return fmt.Errorf("remove - scan reson input: %w", err)
 			}
 
 			break
@@ -175,7 +171,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 
 		err = s.AddRemoveReason(&assert)
 		if err != nil {
-			return fmt.Errorf("db update exec: %w", err)
+			return fmt.Errorf("remove - db exec: %w", err)
 		}
 
 		fmt.Println("Запись удалена")

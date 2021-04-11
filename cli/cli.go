@@ -33,7 +33,7 @@ func (c *CLI) Execute() error {
 
 		err = m.ShowSecondLevel(c.storage)
 		if err != nil {
-			fmt.Println("ошибка: меню второго уровня:", err)
+			return fmt.Errorf("second level menu: %w", err)
 		}
 	}
 }
