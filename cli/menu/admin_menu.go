@@ -15,7 +15,7 @@ type AdminMenu struct {
 	userAction uint8
 }
 
-func (m *AdminMenu) ShowFirstLevel() {
+func (m *AdminMenu) ShowFirstLevel() error {
 	for {
 		var userAction string
 		fmt.Println("0. Выход из приложения")
@@ -25,7 +25,7 @@ func (m *AdminMenu) ShowFirstLevel() {
 
 		_, err := fmt.Scanln(&userAction)
 		if err != nil {
-			fmt.Println(inputErrMsg)
+			fmt.Println("admin action input: %w", err)
 			continue
 		}
 
@@ -47,6 +47,8 @@ func (m *AdminMenu) ShowFirstLevel() {
 		m.userAction = uint8(ua)
 		break
 	}
+
+	return nil
 }
 
 func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {

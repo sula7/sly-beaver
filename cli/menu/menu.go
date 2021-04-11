@@ -5,7 +5,7 @@ import "sly-beaver/storage"
 const inputErrMsg = "Неверный ввод"
 
 type Menuer interface {
-	ShowFirstLevel()
+	ShowFirstLevel() error
 	ShowSecondLevel(s storage.Storage) error
 }
 

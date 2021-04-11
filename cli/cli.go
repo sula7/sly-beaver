@@ -18,7 +18,7 @@ func NewCLIService(storage storage.Storage) *CLI {
 	return &CLI{storage: storage}
 }
 
-func (c *CLI) Start() {
+func (c *CLI) Execute() error {
 	isUserAdmin := c.authUser()
 
 	m := menu.New(isUserAdmin)
@@ -26,9 +26,12 @@ func (c *CLI) Start() {
 	for {
 		fmt.Println("Выберите действие:")
 
-		m.ShowFirstLevel()
+		err := m.ShowFirstLevel()
+		if err != nil {
+			return fmt.Errorf("first level menu: %w", err)
+		}
 
-		err := m.ShowSecondLevel(c.storage)
+		err = m.ShowSecondLevel(c.storage)
 		if err != nil {
 			fmt.Println("ошибка: меню второго уровня:", err)
 		}

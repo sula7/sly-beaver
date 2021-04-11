@@ -31,5 +31,8 @@ func main() {
 	}
 
 	cliService := cli.NewCLIService(db)
-	cliService.Start()
+	err = cliService.Execute()
+	if err != nil {
+		log.Fatalln("cli run:", err)
+	}
 }

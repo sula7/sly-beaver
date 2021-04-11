@@ -12,7 +12,7 @@ type GuestMenu struct {
 	userAction uint8
 }
 
-func (m *GuestMenu) ShowFirstLevel() {
+func (m *GuestMenu) ShowFirstLevel() error {
 	for {
 		var userAction string
 
@@ -22,8 +22,7 @@ func (m *GuestMenu) ShowFirstLevel() {
 
 		_, err := fmt.Scanln(&userAction)
 		if err != nil {
-			fmt.Println(inputErrMsg)
-			continue
+			return fmt.Errorf("guest action input: %w", err)
 		}
 
 		ua, err := strconv.Atoi(userAction)
@@ -44,6 +43,8 @@ func (m *GuestMenu) ShowFirstLevel() {
 		m.userAction = uint8(ua)
 		break
 	}
+
+	return nil
 }
 
 func (m *GuestMenu) ShowSecondLevel(s storage.Storage) error {
