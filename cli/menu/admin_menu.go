@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"sly-beaver/storage"
 )
 
@@ -122,6 +123,61 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 		fmt.Println("Запись создана")
 		fmt.Println()
 	case 2:
+		asserts, err := s.GetNotDeletedAsserts()
+		if err != nil {
+			return fmt.Errorf("получение списка номенклатур: %w", err)
+		}
+
+		fmt.Println("Выберите номенклатуру к удалению (0 для отмены):")
+
+		t := table.NewWriter()
+		t.SetOutputMirror(os.Stdout)
+		t.AppendHeader(table.Row{"№", "Дата создания", "Наименование", "Количество"})
+		for i := 0; i < len(asserts); i++ {
+			t.AppendRow([]interface{}{asserts[i].ID, asserts[i].CreatedAt, asserts[i].Name, asserts[i].Amount},
+				table.RowConfig{})
+		}
+		t.Render()
+
+		var assert storage.Assert
+
+		for {
+			var id int64
+			var rowID string
+
+			_, err = fmt.Scanln(&rowID)
+			if err != nil {
+				return fmt.Errorf("id input while remove row: %w", err)
+			}
+
+			id, err = strconv.ParseInt(rowID, 10, 64)
+			if err != nil {
+				fmt.Println(inputErrMsg)
+				continue
+			}
+
+			if id == 0 {
+				return nil
+			}
+
+			assert.ID = id
+
+			fmt.Println("Введите причину удаления:")
+			_, err = fmt.Scanln(&assert.RemoveReason)
+			if err != nil {
+				return fmt.Errorf("remove reason input: %w", err)
+			}
+
+			break
+		}
+
+		err = s.AddRemoveReason(&assert)
+		if err != nil {
+			return fmt.Errorf("db update exec: %w", err)
+		}
+
+		fmt.Println("Запись удалена")
+		fmt.Println()
 	case 3:
 	}
 

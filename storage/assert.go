@@ -1,10 +1,13 @@
 package storage
 
 type Assert struct {
-	Amount  int64
-	Cost    int64
-	Name    string
-	ValidTo string
+	ID           int64
+	Amount       int64
+	Cost         int64
+	Name         string
+	ValidTo      string
+	CreatedAt    string
+	RemoveReason string
 }
 
 func (s *SqLite) CreateAssert(assert *Assert) error {
@@ -13,5 +16,32 @@ func (s *SqLite) CreateAssert(assert *Assert) error {
 		assert.Amount,
 		assert.Cost,
 		assert.ValidTo)
+	return err
+}
+
+func (s *SqLite) GetNotDeletedAsserts() ([]Assert, error) {
+	rows, err := s.db.Query(`SELECT id, created_at, name, amount FROM assert WHERE remove_reason IS NULL`)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	asserts := []Assert{}
+	for rows.Next() {
+		a := Assert{}
+		err = rows.Scan(&a.ID, &a.CreatedAt, &a.Name, &a.Amount)
+		if err != nil {
+			return nil, err
+		}
+
+		asserts = append(asserts, a)
+	}
+
+	return asserts, err
+}
+
+func (s *SqLite) AddRemoveReason(assert *Assert) error {
+	_, err := s.db.Exec(`UPDATE assert SET remove_reason = $1 WHERE id = $2`, assert.RemoveReason, assert.ID)
 	return err
 }
