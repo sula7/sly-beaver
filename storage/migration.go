@@ -33,13 +33,14 @@ func (s *SqLite) RunMigrations() error {
 
 		CREATE TABLE IF NOT EXISTS assert
 			(
-			    id         integer NOT NULL CONSTRAINT table_name_pk PRIMARY KEY AUTOINCREMENT,
-			    name       text    NOT NULL,
-			    amount     integer NOT NULL,
-			    cost       integer NOT NULL,
-			    valid_to   text    NOT NULL,
-			    created_at text    NOT NULL DEFAULT CURRENT_DATE,
-				remove_reason text
+			    id				integer NOT NULL CONSTRAINT table_name_pk PRIMARY KEY AUTOINCREMENT,
+			    name			text    NOT NULL,
+			    amount			integer NOT NULL,
+			    cost			integer NOT NULL,
+			    valid_to		text    NOT NULL,
+			    created_at		text    NOT NULL DEFAULT CURRENT_DATE,
+				remove_reason	text,
+				removed_at		text
 			);
 		CREATE UNIQUE INDEX table_name_id_uindex ON assert (id);`)
 	if err != nil {

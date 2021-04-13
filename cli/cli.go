@@ -24,7 +24,7 @@ func (c *CLI) Execute() error {
 	m := menu.New(isUserAdmin)
 
 	for {
-		fmt.Println("Выберите действие:")
+		fmt.Println("Выберите действие (ё или ` для выхода):")
 
 		err := m.ShowFirstLevel()
 		if err != nil {

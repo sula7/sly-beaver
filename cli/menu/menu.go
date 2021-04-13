@@ -7,6 +7,7 @@ const inputErrMsg = "Неверный ввод"
 type Menuer interface {
 	ShowFirstLevel() error
 	ShowSecondLevel(s storage.Storage) error
+	showThirdLevel(s storage.Storage) error
 }
 
 func New(isAdmin bool) Menuer {

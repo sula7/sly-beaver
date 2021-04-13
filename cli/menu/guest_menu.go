@@ -50,3 +50,7 @@ func (m *GuestMenu) ShowFirstLevel() error {
 func (m *GuestMenu) ShowSecondLevel(s storage.Storage) error {
 	return nil
 }
+
+func (m *GuestMenu) showThirdLevel(s storage.Storage) error {
+	return nil
+}
