@@ -57,19 +57,25 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 		assert := storage.Assert{}
 		var err error
 
-		fmt.Println("\nВведите наименование:")
+		fmt.Println("\nВведите наименование (ё или ` для отмены):")
 		_, err = fmt.Scanln(&assert.Name)
 		if err != nil {
 			return fmt.Errorf("create - scan name input: %w", err)
+		}
+		if isExistCalled(assert.Name) {
+			return nil
 		}
 		assert.Name = strings.TrimSpace(assert.Name)
 
 		for {
 			var amount string
-			fmt.Println("Введите количество:")
+			fmt.Println("Введите количество (ё или ` для отмены):")
 			_, err = fmt.Scanln(&amount)
 			if err != nil {
 				return fmt.Errorf("create - scan amount input: %w", err)
+			}
+			if isExistCalled(amount) {
+				return nil
 			}
 
 			assert.Amount, err = strconv.ParseInt(strings.TrimSpace(amount), 10, 64)
@@ -82,10 +88,13 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 
 		for {
 			var cost string
-			fmt.Println("Введите стоимость:")
+			fmt.Println("Введите стоимость (ё или ` для отмены):")
 			_, err = fmt.Scanln(&cost)
 			if err != nil {
 				return fmt.Errorf("create - scan cost input: %w", err)
+			}
+			if isExistCalled(cost) {
+				return nil
 			}
 
 			assert.Cost, err = strconv.ParseInt(strings.TrimSpace(cost), 10, 64)
@@ -97,11 +106,16 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 		}
 
 		for {
-			fmt.Println("Введите срок годности (ГГГГ-ММ-ДД):")
+			fmt.Println("Введите срок годности ГГГГ-ММ-ДД (ё или ` для отмены):")
 			_, err = fmt.Scanln(&assert.ValidTo)
 			if err != nil {
 				return fmt.Errorf("create - scan valid to input: %w", err)
 			}
+
+			if isExistCalled(assert.ValidTo) {
+				return nil
+			}
+
 			_, err = time.Parse("2006-01-02", assert.ValidTo)
 			if err != nil {
 				fmt.Println(inputErrMsg)
@@ -123,7 +137,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 			return fmt.Errorf("получение списка номенклатур: %w", err)
 		}
 
-		fmt.Println("Выберите номенклатуру к удалению (0 для отмены):")
+		fmt.Println("Выберите номенклатуру к удалению (ё или ` для отмены):")
 
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
@@ -145,6 +159,10 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 				return fmt.Errorf("remove - scan id input: %w", err)
 			}
 
+			if isExistCalled(rowID) {
+				return nil
+			}
+
 			id, err = strconv.ParseInt(rowID, 10, 64)
 			if err != nil {
 				fmt.Println(inputErrMsg)
@@ -157,10 +175,14 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 
 			assert.ID = id
 
-			fmt.Println("Введите причину удаления:")
+			fmt.Println("Введите причину удаления (ё или ` для отмены):")
 			_, err = fmt.Scanln(&assert.RemoveReason)
 			if err != nil {
 				return fmt.Errorf("remove - scan reson input: %w", err)
+			}
+
+			if isExistCalled(assert.RemoveReason) {
+				return nil
 			}
 
 			break
@@ -177,4 +199,12 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 	}
 
 	return nil
+}
+
+func isExistCalled(userInput string) bool {
+	if userInput == "`" || userInput == "ё" {
+		return true
+	}
+
+	return false
 }
