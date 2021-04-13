@@ -200,11 +200,3 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 
 	return nil
 }
-
-func isExistCalled(userInput string) bool {
-	if userInput == "`" || userInput == "ё" {
-		return true
-	}
-
-	return false
-}

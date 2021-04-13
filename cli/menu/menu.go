@@ -16,3 +16,11 @@ func New(isAdmin bool) Menuer {
 
 	return &GuestMenu{}
 }
+
+func isExistCalled(userInput string) bool {
+	if userInput == "`" || userInput == "ё" {
+		return true
+	}
+
+	return false
+}
