@@ -20,7 +20,9 @@ func (s *SqLite) CreateAssert(assert *Assert) error {
 }
 
 func (s *SqLite) GetNotDeletedAsserts() ([]*Assert, error) {
-	rows, err := s.db.Query(`SELECT id, created_at, name, amount FROM assert WHERE remove_reason IS NULL`)
+	rows, err := s.db.Query(`SELECT id, created_at, name, amount, cost, valid_to
+			FROM assert
+			WHERE remove_reason IS NULL`)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +32,7 @@ func (s *SqLite) GetNotDeletedAsserts() ([]*Assert, error) {
 	asserts := []*Assert{}
 	for rows.Next() {
 		a := Assert{}
-		err = rows.Scan(&a.ID, &a.CreatedAt, &a.Name, &a.Amount)
+		err = rows.Scan(&a.ID, &a.CreatedAt, &a.Name, &a.Amount, &a.Cost, &a.ValidTo)
 		if err != nil {
 			return nil, err
 		}

@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"sly-beaver/storage"
 )
 
@@ -27,20 +28,19 @@ type Menuer interface {
 }
 
 type Menu struct {
-	delim  byte
 	reader *bufio.Reader
 }
 
 func New(isAdmin bool) Menuer {
 	switch {
 	case isAdmin && runtime.GOOS == "windows":
-		return &AdminMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin), delim: '\r' + '\n'}}
+		return &AdminMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin)}}
 	case isAdmin && runtime.GOOS != "windows":
-		return &AdminMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin), delim: '\n'}}
+		return &AdminMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin)}}
 	case !isAdmin && runtime.GOOS == "windows":
-		return &GuestMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin), delim: '\r' + '\n'}}
+		return &GuestMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin)}}
 	case !isAdmin && runtime.GOOS != "windows:":
-		return &GuestMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin), delim: '\n'}}
+		return &GuestMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin)}}
 	}
 	return nil
 }
@@ -54,10 +54,12 @@ func (m *Menu) isExitCalled(userInput string) bool {
 }
 
 func (m *Menu) readInput() (string, error) {
-	input, err := m.reader.ReadString(m.delim)
+	input, err := m.reader.ReadString('\n')
 	if err != nil {
 		return "", err
 	}
+
+	input = strings.TrimRight(input, "\r\n")
 
 	return strings.TrimSpace(input), nil
 }
@@ -157,6 +159,15 @@ func (m *Menu) showReportMenu(s storage.Storage) error {
 	}
 
 	return nil
+}
+
+func (m *Menu) renderAssertsView(captions table.Row, rows []table.Row) {
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(captions)
+	t.AppendRows(rows, table.RowConfig{})
+	t.Render()
+	fmt.Println()
 }
 
 func createReportFile(fileContent, filename string) error {

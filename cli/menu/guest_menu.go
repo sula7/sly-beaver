@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"sly-beaver/storage"
 )
 
@@ -52,6 +53,17 @@ func (m *GuestMenu) ShowFirstLevel() error {
 func (m *GuestMenu) ShowSecondLevel(s storage.Storage) error {
 	switch m.userAction {
 	case 1:
+		asserts, err := s.GetNotDeletedAsserts()
+		if err != nil {
+			return fmt.Errorf("получение списка номенклатур: %w", err)
+		}
+
+		rows := []table.Row{}
+		for i := 0; i < len(asserts); i++ {
+			rows = append(rows, table.Row{asserts[i].Name, asserts[i].Amount, asserts[i].Cost, asserts[i].ValidTo})
+		}
+
+		m.renderAssertsView(table.Row{"Наименование", "Количество", "Цена", "Срок годности"}, rows)
 	case 2:
 		err := m.showReportMenu(s)
 		if err != nil {

@@ -140,17 +140,14 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 
 		fmt.Println("Выберите номенклатуру к удалению (ё или ` для отмены):")
 
-		t := table.NewWriter()
-		t.SetOutputMirror(os.Stdout)
-		t.AppendHeader(table.Row{"№", "Дата создания", "Наименование", "Количество"})
+		rows := []table.Row{}
 		for i := 0; i < len(asserts); i++ {
-			t.AppendRow([]interface{}{asserts[i].ID, asserts[i].CreatedAt, asserts[i].Name, asserts[i].Amount},
-				table.RowConfig{})
+			rows = append(rows, table.Row{asserts[i].ID, asserts[i].CreatedAt, asserts[i].Name, asserts[i].Amount})
 		}
-		t.Render()
+
+		m.renderAssertsView(table.Row{"№", "Дата создания", "Наименование", "Количество"}, rows)
 
 		var assert storage.Assert
-
 		for {
 			var id int64
 
