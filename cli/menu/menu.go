@@ -25,7 +25,6 @@ type Menuer interface {
 }
 
 func New(isAdmin bool) Menuer {
-	fmt.Println(runtime.GOOS)
 	switch {
 	case isAdmin && runtime.GOOS == "windows":
 		return &AdminMenu{reader: bufio.NewReader(os.Stdin), delim: '\r' + '\n'}

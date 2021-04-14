@@ -75,7 +75,7 @@ func (s *SqLite) GetLastWeekAllAsserts() ([]*Assert, error) {
 func (s *SqLite) GetLastWeekRemovedAsserts() ([]*Assert, error) {
 	rows, err := s.db.Query(`SELECT name, amount, remove_reason
 			FROM assert
-			WHERE DATE(removed_at) >= DATE('now', '-7 days')`)
+			WHERE DATE(removed_at) >= DATE('now', '-7 days') AND remove_reason IS NOT NULL`)
 	if err != nil {
 		return nil, err
 	}
@@ -86,6 +86,30 @@ func (s *SqLite) GetLastWeekRemovedAsserts() ([]*Assert, error) {
 	for rows.Next() {
 		a := &Assert{}
 		err = rows.Scan(&a.Name, &a.Amount, &a.RemoveReason)
+		if err != nil {
+			return nil, err
+		}
+
+		asserts = append(asserts, a)
+	}
+
+	return asserts, err
+}
+
+func (s *SqLite) GetCurrentAsserts() ([]*Assert, error) {
+	rows, err := s.db.Query(`SELECT name, amount, cost, valid_to
+			FROM assert
+			WHERE remove_reason IS NULL`)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	asserts := []*Assert{}
+	for rows.Next() {
+		a := &Assert{}
+		err = rows.Scan(&a.Name, &a.Amount, &a.Cost, &a.ValidTo)
 		if err != nil {
 			return nil, err
 		}

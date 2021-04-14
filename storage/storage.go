@@ -10,4 +10,5 @@ type Storage interface {
 	AddRemoveReason(assert *Assert) error
 	GetLastWeekAllAsserts() ([]*Assert, error)
 	GetLastWeekRemovedAsserts() ([]*Assert, error)
+	GetCurrentAsserts() ([]*Assert, error)
 }

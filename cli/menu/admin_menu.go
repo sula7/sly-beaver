@@ -245,7 +245,7 @@ func (m *AdminMenu) showThirdLevel(s storage.Storage) error {
 			return fmt.Errorf("get all asserts last week: %w", err)
 		}
 
-		csvContent := fmt.Sprint("№;Наименование;Количество;Цена;Срок годности\n")
+		csvContent := fmt.Sprintln("№;Наименование;Количество;Цена;Срок годности")
 		for i := 0; i < len(asserts); i++ {
 			csvContent += fmt.Sprintf("%d;%s;%d;%d;%s\n",
 				i+1, asserts[i].Name, asserts[i].Amount, asserts[i].Cost, asserts[i].ValidTo)
@@ -280,6 +280,25 @@ func (m *AdminMenu) showThirdLevel(s storage.Storage) error {
 		fmt.Println("Отчёт создан", removedAssertsFilename)
 		fmt.Println()
 	case 3:
+		asserts, err := s.GetCurrentAsserts()
+		if err != nil {
+			return fmt.Errorf("get current asserts: %w", err)
+		}
+
+		csvContent := fmt.Sprintln("№;Наименование;Количество;Цена;Срок годности")
+		for i := 0; i < len(asserts); i++ {
+			csvContent += fmt.Sprintf("%d;%s;%d;%d;%s\n",
+				i+1, asserts[i].Name, asserts[i].Amount, asserts[i].Cost, asserts[i].ValidTo)
+		}
+		csvContent += fmt.Sprintf(";;;;;%s", time.Now().Format("2006-01-02"))
+
+		err = createReportFile(csvContent, currentAssertsFilename)
+		if err != nil {
+			return fmt.Errorf("current asserts: %w", err)
+		}
+
+		fmt.Println("Отчёт создан", currentAssertsFilename)
+		fmt.Println()
 	}
 
 	return nil
