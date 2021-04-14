@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"sly-beaver/storage"
 )
@@ -17,13 +18,11 @@ type GuestMenu struct {
 
 func (m *GuestMenu) ShowFirstLevel() error {
 	for {
-		var userAction string
-
 		fmt.Println("0. Выход из приложения")
 		fmt.Println("1. Просмотреть номенклатуры")
 		fmt.Println("2. Распечатать номенклатуры")
 
-		_, err := fmt.Scanln(&userAction)
+		userAction, err := m.readInput()
 		if err != nil {
 			return fmt.Errorf("guest action input: %w", err)
 		}
@@ -56,4 +55,13 @@ func (m *GuestMenu) ShowSecondLevel(s storage.Storage) error {
 
 func (m *GuestMenu) showThirdLevel(s storage.Storage) error {
 	return nil
+}
+
+func (m *GuestMenu) readInput() (string, error) {
+	input, err := m.reader.ReadString(m.delim)
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(input), nil
 }
