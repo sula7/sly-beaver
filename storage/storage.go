@@ -8,5 +8,6 @@ type Storage interface {
 	CreateAssert(assert *Assert) error
 	GetNotDeletedAsserts() ([]*Assert, error)
 	AddRemoveReason(assert *Assert) error
-	GetAllRowsForCSV() ([]*Assert, error)
+	GetLastWeekAllAsserts() ([]*Assert, error)
+	GetLastWeekRemovedAsserts() ([]*Assert, error)
 }

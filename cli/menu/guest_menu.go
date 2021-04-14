@@ -1,6 +1,7 @@
 package menu
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strconv"
@@ -10,6 +11,8 @@ import (
 
 type GuestMenu struct {
 	userAction uint8
+	reader     *bufio.Reader
+	delim      byte
 }
 
 func (m *GuestMenu) ShowFirstLevel() error {

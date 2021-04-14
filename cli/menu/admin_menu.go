@@ -1,10 +1,9 @@
 package menu
 
 import (
+	"bufio"
 	"fmt"
-	"log"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -15,6 +14,8 @@ import (
 
 type AdminMenu struct {
 	userAction uint8
+	reader     *bufio.Reader
+	delim      byte
 }
 
 func (m *AdminMenu) ShowFirstLevel() error {
@@ -25,7 +26,7 @@ func (m *AdminMenu) ShowFirstLevel() error {
 	for {
 		var userAction string
 
-		_, err := fmt.Scanln(&userAction)
+		userAction, err := m.readInput()
 		if err != nil {
 			fmt.Println("admin action input: %w", err)
 			continue
@@ -35,7 +36,7 @@ func (m *AdminMenu) ShowFirstLevel() error {
 			os.Exit(0)
 		}
 
-		ua, err := strconv.Atoi(userAction)
+		ua, err := strconv.Atoi(strings.TrimSpace(userAction))
 		if err != nil {
 			fmt.Println(inputErrMsg)
 			continue
@@ -60,27 +61,27 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 		var err error
 
 		fmt.Println("\nВведите наименование (ё или ` для отмены):")
-		_, err = fmt.Scanln(&assert.Name)
+		assert.Name, err = m.readInput()
 		if err != nil {
 			return fmt.Errorf("create - scan name input: %w", err)
 		}
+
 		if isExistCalled(assert.Name) {
 			return nil
 		}
-		assert.Name = strings.TrimSpace(assert.Name)
 
 		fmt.Println("Введите количество (ё или ` для отмены):")
 		for {
-			var amount string
-			_, err = fmt.Scanln(&amount)
+			amount, err := m.readInput()
 			if err != nil {
 				return fmt.Errorf("create - scan amount input: %w", err)
 			}
+
 			if isExistCalled(amount) {
 				return nil
 			}
 
-			assert.Amount, err = strconv.ParseInt(strings.TrimSpace(amount), 10, 64)
+			assert.Amount, err = strconv.ParseInt(amount, 10, 64)
 			if err != nil {
 				fmt.Println(inputErrMsg)
 				continue
@@ -90,16 +91,16 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 
 		fmt.Println("Введите стоимость (ё или ` для отмены):")
 		for {
-			var cost string
-			_, err = fmt.Scanln(&cost)
+			cost, err := m.readInput()
 			if err != nil {
 				return fmt.Errorf("create - scan cost input: %w", err)
 			}
+
 			if isExistCalled(cost) {
 				return nil
 			}
 
-			assert.Cost, err = strconv.ParseInt(strings.TrimSpace(cost), 10, 64)
+			assert.Cost, err = strconv.ParseInt(cost, 10, 64)
 			if err != nil {
 				fmt.Println(inputErrMsg)
 				continue
@@ -109,7 +110,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 
 		fmt.Println("Введите срок годности ГГГГ-ММ-ДД (ё или ` для отмены):")
 		for {
-			_, err = fmt.Scanln(&assert.ValidTo)
+			assert.ValidTo, err = m.readInput()
 			if err != nil {
 				return fmt.Errorf("create - scan valid to input: %w", err)
 			}
@@ -154,9 +155,8 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 
 		for {
 			var id int64
-			var rowID string
 
-			_, err = fmt.Scanln(&rowID)
+			rowID, err := m.readInput()
 			if err != nil {
 				return fmt.Errorf("remove - scan id input: %w", err)
 			}
@@ -178,7 +178,7 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 			assert.ID = id
 
 			fmt.Println("Введите причину удаления (ё или ` для отмены):")
-			_, err = fmt.Scanln(&assert.RemoveReason)
+			assert.RemoveReason, err = m.readInput()
 			if err != nil {
 				return fmt.Errorf("remove - scan reson input: %w", err)
 			}
@@ -215,9 +215,7 @@ func (m *AdminMenu) showThirdLevel(s storage.Storage) error {
 
 	var userAction int
 	for {
-		var ua string
-
-		_, err := fmt.Scanln(&ua)
+		ua, err := m.readInput()
 		if err != nil {
 			fmt.Println("admin action input: %w", err)
 			continue
@@ -242,7 +240,7 @@ func (m *AdminMenu) showThirdLevel(s storage.Storage) error {
 
 	switch userAction {
 	case 1:
-		asserts, err := s.GetAllRowsForCSV()
+		asserts, err := s.GetLastWeekAllAsserts()
 		if err != nil {
 			return fmt.Errorf("get all asserts last week: %w", err)
 		}
@@ -254,30 +252,44 @@ func (m *AdminMenu) showThirdLevel(s storage.Storage) error {
 		}
 		csvContent += fmt.Sprintf(";;;;;%s", time.Now().Format("2006-01-02"))
 
-		workDir := filepath.Dir(os.Args[0])
-		csvPath := filepath.Join(workDir, "all_rows.csv")
-		file, err := os.Create(csvPath)
+		err = createReportFile(csvContent, allAssertsFilename)
 		if err != nil {
-			return fmt.Errorf("create csv for all rows csv: %w", err)
+			return fmt.Errorf("all asserts: %w", err)
 		}
 
-		defer func() {
-			err := file.Close()
-			if err != nil {
-				log.Println("defer all rows csv file close:", err)
-			}
-		}()
-
-		_, err = file.WriteString(csvContent)
-		if err != nil {
-			return fmt.Errorf("all rows csv file write: %w", err)
-		}
-
-		fmt.Println("Отчёт создан", csvPath)
+		fmt.Println("Отчёт создан", allAssertsFilename)
 		fmt.Println()
 	case 2:
+		asserts, err := s.GetLastWeekRemovedAsserts()
+		if err != nil {
+			return fmt.Errorf("get removed asserts last week: %w", err)
+		}
+
+		csvContent := fmt.Sprintln("№;Наименование;Количество;Причина")
+		for i := 0; i < len(asserts); i++ {
+			csvContent += fmt.Sprintf("%d;%s;%d;%s\n",
+				i+1, asserts[i].Name, asserts[i].Amount, asserts[i].RemoveReason)
+		}
+		csvContent += fmt.Sprintf(";;;;%s", time.Now().Format("2006-01-02"))
+
+		err = createReportFile(csvContent, removedAssertsFilename)
+		if err != nil {
+			return fmt.Errorf("removed asserts: %w", err)
+		}
+
+		fmt.Println("Отчёт создан", removedAssertsFilename)
+		fmt.Println()
 	case 3:
 	}
 
 	return nil
+}
+
+func (m *AdminMenu) readInput() (string, error) {
+	input, err := m.reader.ReadString(m.delim)
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(input), nil
 }

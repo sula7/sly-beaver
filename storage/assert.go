@@ -47,7 +47,7 @@ func (s *SqLite) AddRemoveReason(assert *Assert) error {
 	return err
 }
 
-func (s *SqLite) GetAllRowsForCSV() ([]*Assert, error) {
+func (s *SqLite) GetLastWeekAllAsserts() ([]*Assert, error) {
 	rows, err := s.db.Query(`SELECT name, amount, cost, valid_to
 			FROM assert
 			WHERE DATE(created_at) >= DATE('now', '-7 days')`)
@@ -60,13 +60,37 @@ func (s *SqLite) GetAllRowsForCSV() ([]*Assert, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		a := Assert{}
+		a := &Assert{}
 		err = rows.Scan(&a.Name, &a.Amount, &a.Cost, &a.ValidTo)
 		if err != nil {
 			return nil, err
 		}
 
-		asserts = append(asserts, &a)
+		asserts = append(asserts, a)
+	}
+
+	return asserts, err
+}
+
+func (s *SqLite) GetLastWeekRemovedAsserts() ([]*Assert, error) {
+	rows, err := s.db.Query(`SELECT name, amount, remove_reason
+			FROM assert
+			WHERE DATE(removed_at) >= DATE('now', '-7 days')`)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	asserts := []*Assert{}
+	for rows.Next() {
+		a := &Assert{}
+		err = rows.Scan(&a.Name, &a.Amount, &a.RemoveReason)
+		if err != nil {
+			return nil, err
+		}
+
+		asserts = append(asserts, a)
 	}
 
 	return asserts, err
