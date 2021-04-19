@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -32,17 +31,11 @@ type Menu struct {
 }
 
 func New(isAdmin bool) Menuer {
-	switch {
-	case isAdmin && runtime.GOOS == "windows":
+	if isAdmin {
 		return &AdminMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin)}}
-	case isAdmin && runtime.GOOS != "windows":
-		return &AdminMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin)}}
-	case !isAdmin && runtime.GOOS == "windows":
-		return &GuestMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin)}}
-	case !isAdmin && runtime.GOOS != "windows:":
-		return &GuestMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin)}}
 	}
-	return nil
+
+	return &GuestMenu{Menu: &Menu{reader: bufio.NewReader(os.Stdin)}}
 }
 
 func (m *Menu) isExitCalled(userInput string) bool {
