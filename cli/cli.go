@@ -3,6 +3,9 @@ package cli
 import (
 	"database/sql"
 	"fmt"
+	"syscall"
+
+	"golang.org/x/crypto/ssh/terminal"
 
 	"sly-beaver/cli/menu"
 	"sly-beaver/storage"
@@ -40,7 +43,7 @@ func (c *CLI) Execute() error {
 
 func (c *CLI) authUser() bool {
 	var login string
-	var password string
+	var password []byte
 	var isAdmin bool
 	var isUserExists bool
 
@@ -52,13 +55,13 @@ func (c *CLI) authUser() bool {
 		}
 
 		fmt.Println("Введите пароль:")
-		_, err = fmt.Scanln(&password)
+		password, err = terminal.ReadPassword(int(syscall.Stdin))
 		if err != nil {
 			fmt.Println(inputErrMsg)
 			continue
 		}
 
-		isUserExists, isAdmin, err = c.storage.CheckPassword(login, password)
+		isUserExists, isAdmin, err = c.storage.CheckPassword(login, string(password))
 		if err != nil && err != sql.ErrNoRows {
 			fmt.Println("check user in DB:", err)
 			continue
