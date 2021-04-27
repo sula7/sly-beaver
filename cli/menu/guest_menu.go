@@ -60,10 +60,10 @@ func (m *GuestMenu) ShowSecondLevel(s storage.Storage) error {
 
 		rows := []table.Row{}
 		for i := 0; i < len(asserts); i++ {
-			rows = append(rows, table.Row{asserts[i].Name, asserts[i].Amount, asserts[i].Cost, asserts[i].ValidTo})
+			rows = append(rows, table.Row{asserts[i].Name, asserts[i].Amount, asserts[i].Cost, asserts[i].BuyDate})
 		}
 
-		m.renderAssertsView(table.Row{"Наименование", "Количество", "Цена", "Срок годности"}, rows)
+		m.renderAssertsView(table.Row{"Наименование", "Количество", "Цена", "Дата покупки"}, rows)
 	case 2:
 		err := m.showReportMenu(s)
 		if err != nil {

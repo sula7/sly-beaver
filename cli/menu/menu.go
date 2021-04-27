@@ -95,10 +95,10 @@ func (m *Menu) showReportMenu(s storage.Storage) error {
 			return fmt.Errorf("get all asserts last week: %w", err)
 		}
 
-		csvContent := fmt.Sprintln("№;Наименование;Количество;Цена;Срок годности")
+		csvContent := fmt.Sprintln("№;Наименование;Количество;Цена;Дата покупки")
 		for i := 0; i < len(asserts); i++ {
 			csvContent += fmt.Sprintf("%d;%s;%d;%d;%s\n",
-				i+1, asserts[i].Name, asserts[i].Amount, asserts[i].Cost, asserts[i].ValidTo)
+				i+1, asserts[i].Name, asserts[i].Amount, asserts[i].Cost, asserts[i].BuyDate)
 		}
 		csvContent += fmt.Sprintf(";;;;;%s", time.Now().Format("2006-01-02"))
 
@@ -135,10 +135,10 @@ func (m *Menu) showReportMenu(s storage.Storage) error {
 			return fmt.Errorf("get current asserts: %w", err)
 		}
 
-		csvContent := fmt.Sprintln("№;Наименование;Количество;Цена;Срок годности")
+		csvContent := fmt.Sprintln("№;Наименование;Количество;Цена;Дата покупки")
 		for i := 0; i < len(asserts); i++ {
 			csvContent += fmt.Sprintf("%d;%s;%d;%d;%s\n",
-				i+1, asserts[i].Name, asserts[i].Amount, asserts[i].Cost, asserts[i].ValidTo)
+				i+1, asserts[i].Name, asserts[i].Amount, asserts[i].Cost, asserts[i].BuyDate)
 		}
 		csvContent += fmt.Sprintf(";;;;;%s", time.Now().Format("2006-01-02"))
 

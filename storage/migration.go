@@ -37,7 +37,7 @@ func (s *SqLite) RunMigrations() error {
 			    name			text    NOT NULL,
 			    amount			integer NOT NULL,
 			    cost			integer NOT NULL,
-			    valid_to		text    NOT NULL,
+			    buy_date		text    NOT NULL,
 			    created_at		text    NOT NULL DEFAULT CURRENT_DATE,
 				remove_reason	text,
 				removed_at		text

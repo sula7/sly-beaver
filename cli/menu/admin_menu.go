@@ -106,18 +106,18 @@ func (m *AdminMenu) ShowSecondLevel(s storage.Storage) error {
 			break
 		}
 
-		fmt.Println("Введите срок годности ГГГГ-ММ-ДД (ё или ` для отмены):")
+		fmt.Println("Введите дату покупки ГГГГ-ММ-ДД (ё или ` для отмены):")
 		for {
-			assert.ValidTo, err = m.readInput()
+			assert.BuyDate, err = m.readInput()
 			if err != nil {
 				return fmt.Errorf("create - scan valid to input: %w", err)
 			}
 
-			if m.isExitCalled(assert.ValidTo) {
+			if m.isExitCalled(assert.BuyDate) {
 				return nil
 			}
 
-			_, err = time.Parse("2006-01-02", assert.ValidTo)
+			_, err = time.Parse("2006-01-02", assert.BuyDate)
 			if err != nil {
 				fmt.Println(inputErrMsg)
 				continue
