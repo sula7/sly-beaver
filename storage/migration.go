@@ -28,8 +28,8 @@ func (s *SqLite) RunMigrations() error {
 	_, err = tx.ExecContext(ctx, `
 		CREATE TABLE IF NOT EXISTS user(login text, password text, is_admin boolean);
 		INSERT INTO user (login, password, is_admin)
-		VALUES ('admin', '1234', true),
-		       ('guest', '4321', false);
+		VALUES ('администратор', 'password', true),
+		       ('гость', 'asd123', false);
 
 		CREATE TABLE IF NOT EXISTS assert
 			(

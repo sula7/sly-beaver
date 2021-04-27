@@ -3,6 +3,7 @@ package storage
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -31,12 +32,10 @@ func OpenDB(filePath string) (*SqLite, error) {
 }
 
 func (s *SqLite) CheckPassword(login, password string) (isExists, isAdmin bool, err error) {
-	err = s.db.QueryRow(`SELECT exists(SELECT login
+	err = s.db.QueryRow(`SELECT exists(SELECT login FROM user), is_admin
 			FROM user
 			WHERE login = $1
-			  AND password = $2), is_admin
-			  FROM user
-			WHERE login = $1 AND password = $2`, login, password).
+		  	AND password = $2`, strings.ToLower(login), password).
 		Scan(&isExists, &isAdmin)
 	return
 }
