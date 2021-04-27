@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/jedib0t/go-pretty/v6/table"
+
 	"sly-beaver/storage"
 )
 
